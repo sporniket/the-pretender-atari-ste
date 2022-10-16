@@ -18,7 +18,3 @@ You should have received a copy of the GNU General Public License along with Spo
 If not, see <https://www.gnu.org/licenses/>. 
 ---
 """
-
-from .address_decoder import AddressDecoder24Bits, SelectedSubsystem
-
-__all__ = ["AddressDecoder24Bits", "SelectedSubsystem"]
