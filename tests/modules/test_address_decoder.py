@@ -15,7 +15,7 @@ or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with Sporniket's "The Pretender -- Atari STe" project.
-If not, see <https://www.gnu.org/licenses/>. 
+If not, see <https://www.gnu.org/licenses/>.
 ---
 """
 ### builtin deps
@@ -46,8 +46,7 @@ def test_shouldDecodePage0_theTwoFirstLongAreMappedToROM():
                 & (Past(decoder.address_page) == 0)
                 & (Past(decoder.address_sub_page) == 0)
                 & (Past(decoder.address_sub_sub_page) == 0)
-                & Past(decoder.address_long)
-                == i
+                & (Past(decoder.address_long) == i)
             ):
                 m.d.sync += [
                     Assert(decoder.decode == SelectedSubsystem.ROM.value),
@@ -58,7 +57,7 @@ def test_shouldDecodePage0_theTwoFirstLongAreMappedToROM():
         "should Decode Page0 -- the Two First Long Are Mapped To ROM",
         AddressDecoder24Bits(),
         testBody,
-        2,
+        5,
     )
 
 
@@ -72,8 +71,7 @@ def test_shouldDecodePage0_theRamIsMappedStartingFromThirdLong():
             & (Past(decoder.address_page) == 0)
             & (Past(decoder.address_sub_page) == 0)
             & (Past(decoder.address_sub_sub_page) == 0)
-            & Past(decoder.address_long)
-            > 1
+            & (Past(decoder.address_long) > 1)
         ):
             m.d.sync += [
                 Assert(decoder.decode == SelectedSubsystem.RAM.value),
@@ -105,5 +103,5 @@ def test_shouldDecodePage0_theRamIsMappedStartingFromThirdLong():
         "should Decode Page0 -- the RAM Is Mapped Starting From Third Long",
         AddressDecoder24Bits(),
         testBody,
-        2,
+        5,
     )
