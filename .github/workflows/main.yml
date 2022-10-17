@@ -33,6 +33,7 @@ jobs:
         pip install 'amaranth @ git+https://github.com/amaranth-lang/amaranth@3a51b612844a23b08e744c4b3372ecb44bf9fe5d'
         pip install 'amaranth-boards @ git+https://github.com/amaranth-lang/amaranth-boards@2d0a23b75ebb769874719297dec65ff07ca9e79f'
         pip install 'amaranth-yosys @ git+https://github.com/amaranth-lang/amaranth-yosys@85067f31288493989d6403527309888e839a65a3'
+        pip install 'amaranth-stuff-by-sporniket @ git+https://github.com/sporniket/amaranth-stuff@cdbfa01800210c4d55afc25dda1872014e127f23'
     - name: Preserve Wasm cache
       uses: actions/cache@v1
       with:
