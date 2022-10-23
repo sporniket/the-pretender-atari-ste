@@ -53,12 +53,7 @@ def test_shouldDecodePage0_theTwoFirstLongAreMappedToROM():
                     Assert(~(decoder.error)),
                 ]
 
-    Test.describe(
-        "should Decode Page0 -- the Two First Long Are Mapped To ROM",
-        AddressDecoder24Bits(),
-        testBody,
-        5,
-    )
+    Test.describe(AddressDecoder24Bits(), testBody)
 
 
 def test_shouldDecodePage0_theRamIsMappedStartingFromThirdLong():
@@ -99,9 +94,4 @@ def test_shouldDecodePage0_theRamIsMappedStartingFromThirdLong():
                 Assert(~(decoder.error)),
             ]
 
-    Test.describe(
-        "should Decode Page0 -- the RAM Is Mapped Starting From Third Long",
-        AddressDecoder24Bits(),
-        testBody,
-        5,
-    )
+    Test.describe(AddressDecoder24Bits(), testBody)

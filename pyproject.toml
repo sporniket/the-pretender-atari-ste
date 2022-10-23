@@ -29,7 +29,7 @@ classifiers = [
 dependencies = [
     "amaranth @ git+https://github.com/amaranth-lang/amaranth@3a51b612844a23b08e744c4b3372ecb44bf9fe5d",
     "amaranth-boards @ git+https://github.com/amaranth-lang/amaranth-boards@2d0a23b75ebb769874719297dec65ff07ca9e79f",
-    "amaranth-stuff-by-sporniket @ git+https://github.com/sporniket/amaranth-stuff@cdbfa01800210c4d55afc25dda1872014e127f23",
+    "amaranth-stuff-by-sporniket @ git+https://github.com/sporniket/amaranth-stuff@256bb0a1afac22b8311e5c660b8213f9dd444c94",
     'importlib-metadata; python_version>"3.8"',
 ]
 dynamic = ["version"]
