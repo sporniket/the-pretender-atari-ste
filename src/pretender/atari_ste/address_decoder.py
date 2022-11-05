@@ -60,23 +60,25 @@ class AddressDecoder24Bits(Elaboratable):
     def elaborate(self, platform: Platform) -> Module:
         m = Module()
 
-        # reset error state, unless there is an error below
-        m.d.sync += self.error.eq(0)
+        # reset error state, unless there is match below
+        m.d.sync += self.error.eq(1)
+        # reset selection state, unless there is a match below
+        m.d.sync += self.decode.eq(SelectedSubsystem.NONE.value)
 
         with m.If(((self.fc)[2])):
             # super user mode
             with m.If(((self.address_page) == 0)):
                 self.elaborate_super_page0(m, platform)
-            with m.Else():
-                m.d.sync += [
-                    self.decode.eq(SelectedSubsystem.NONE.value),
-                    self.error.eq(1),
-                ]
+        with m.If((~(self.fc)[2])):
+            # user mode
+            with m.If(((self.address_page) == 0)):
+                self.elaborate_user_page0(m, platform)
         return m
 
     def elaborate_super_page0(self, m: Module, platform: Platform):
         m.d.sync += [
-            self.decode.eq(SelectedSubsystem.RAM.value)
+            self.decode.eq(SelectedSubsystem.RAM.value),
+            self.error.eq(0),
         ]  # select RAM by default
         with m.If(
             ((self.address_sub_page) == 0)
@@ -84,3 +86,16 @@ class AddressDecoder24Bits(Elaboratable):
             & ((self.address_long == 0) | (self.address_long == 1))
         ):
             m.d.sync += [self.decode.eq(SelectedSubsystem.ROM.value)]
+
+    def elaborate_user_page0(self, m: Module, platform: Platform):
+        m.d.sync += [
+            self.decode.eq(SelectedSubsystem.RAM.value),
+            self.error.eq(0),
+        ]  # select RAM by default
+        with m.If(
+            ((self.address_sub_page) == 0)
+            & ((self.address_sub_sub_page) == 0)
+            & ((self.address_long == 0) | (self.address_long < 200))
+        ):
+            # prevent any access under address 0x800
+            m.d.sync += [self.decode.eq(SelectedSubsystem.NONE.value), self.error.eq(1)]

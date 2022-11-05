@@ -35,7 +35,7 @@ from amaranth_stuff.testing import Test
 from pretender.atari_ste import AddressDecoder24Bits, SelectedSubsystem
 
 
-def test_shouldDecodePage0_theTwoFirstLongAreMappedToROM():
+def test_shouldDecodePage0_super_theTwoFirstLongAreMappedToROM():
     def testBody(m: Module, cd: ClockDomain):
         rst = cd.rst
         decoder = m.submodules.dut
@@ -56,7 +56,7 @@ def test_shouldDecodePage0_theTwoFirstLongAreMappedToROM():
     Test.describe(AddressDecoder24Bits(), testBody)
 
 
-def test_shouldDecodePage0_theRamIsMappedStartingFromThirdLong():
+def test_shouldDecodePage0_super_theRamIsMappedStartingFromThirdLong():
     def testBody(m: Module, cd: ClockDomain):
         rst = cd.rst
         decoder = m.submodules.dut
@@ -86,6 +86,68 @@ def test_shouldDecodePage0_theRamIsMappedStartingFromThirdLong():
         with m.If(
             ~Past(rst)
             & (Past(decoder.fc)[2])
+            & (Past(decoder.address_page) == 0)
+            & (Past(decoder.address_sub_page) > 0)
+        ):
+            m.d.sync += [
+                Assert(decoder.decode == SelectedSubsystem.RAM.value),
+                Assert(~(decoder.error)),
+            ]
+
+    Test.describe(AddressDecoder24Bits(), testBody)
+
+
+def test_shouldDecodePage0_user_shouldRejectAccessBelow800():
+    def testBody(m: Module, cd: ClockDomain):
+        rst = cd.rst
+        decoder = m.submodules.dut
+        with m.If(
+            ~Past(rst)
+            & (Past(decoder.fc)[2] == 0)
+            & (Past(decoder.address_page) == 0)
+            & (Past(decoder.address_sub_page) == 0)
+            & (Past(decoder.address_sub_sub_page) == 0)
+            & (Past(decoder.address_long) > 0)
+            & (Past(decoder.address_long) < 200)
+        ):
+            m.d.sync += [
+                Assert(decoder.decode == SelectedSubsystem.NONE.value),
+                Assert((decoder.error)),
+            ]
+
+    Test.describe(AddressDecoder24Bits(), testBody)
+
+
+def test_shouldDecodePage0_user_shouldAccessToRamWhenAddressIsAbove800():
+    def testBody(m: Module, cd: ClockDomain):
+        rst = cd.rst
+        decoder = m.submodules.dut
+        with m.If(
+            ~Past(rst)
+            & (Past(decoder.fc)[2] == 0)
+            & (Past(decoder.address_page) == 0)
+            & (Past(decoder.address_sub_page) == 0)
+            & (Past(decoder.address_sub_sub_page) == 0)
+            & (Past(decoder.address_long) >= 0x200)
+        ):
+            m.d.sync += [
+                Assert(decoder.decode == SelectedSubsystem.RAM.value),
+                Assert(~(decoder.error)),
+            ]
+        with m.If(
+            ~Past(rst)
+            & (Past(decoder.fc)[2] == 0)
+            & (Past(decoder.address_page) == 0)
+            & (Past(decoder.address_sub_page) == 0)
+            & (Past(decoder.address_sub_sub_page) > 0)
+        ):
+            m.d.sync += [
+                Assert(decoder.decode == SelectedSubsystem.RAM.value),
+                Assert(~(decoder.error)),
+            ]
+        with m.If(
+            ~Past(rst)
+            & (Past(decoder.fc)[2] == 0)
             & (Past(decoder.address_page) == 0)
             & (Past(decoder.address_sub_page) > 0)
         ):
