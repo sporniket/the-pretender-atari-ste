@@ -107,7 +107,6 @@ def test_shouldDecodePage0_user_shouldRejectAccessBelow800():
             & (Past(decoder.address_page) == 0)
             & (Past(decoder.address_sub_page) == 0)
             & (Past(decoder.address_sub_sub_page) == 0)
-            & (Past(decoder.address_long) > 0)
             & (Past(decoder.address_long) < 200)
         ):
             m.d.sync += [
