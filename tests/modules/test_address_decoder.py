@@ -157,3 +157,21 @@ def test_shouldDecodePage0_user_shouldAccessToRamWhenAddressIsAbove800():
             ]
 
     Test.describe(AddressDecoder24Bits(), testBody)
+
+
+def test_shouldDecodePage1ToC():
+    def testBody(m: Module, cd: ClockDomain):
+        rst = cd.rst
+        decoder = m.submodules.dut
+        # for page in range(2, 0xD):
+        with m.If(
+            (~Past(rst))
+            & (Past(decoder.address_page) > 0)
+            & (Past(decoder.address_page) < 0xD)
+        ):
+            m.d.sync += [
+                Assert(decoder.decode == SelectedSubsystem.RAM.value),
+                Assert(~(decoder.error)),
+            ]
+
+    Test.describe(AddressDecoder24Bits(), testBody)

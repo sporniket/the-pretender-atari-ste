@@ -42,8 +42,8 @@ class AddressDecoder24Bits(Elaboratable):
         self.address_long = Signal(6)
         self.fc = Signal(3)
         self.rxw = Signal()
-        self.decode = Signal(2, reset=SelectedSubsystem.ROM.value)
-        self.error = Signal()
+        self.decode = Signal(2, reset=SelectedSubsystem.NONE.value)
+        self.error = Signal(reset=1)
 
     def ports(self) -> List[Signal]:
         return [
@@ -67,12 +67,20 @@ class AddressDecoder24Bits(Elaboratable):
 
         with m.If(((self.fc)[2])):
             # super user mode
-            with m.If(((self.address_page) == 0)):
-                self.elaborate_super_page0(m, platform)
+            for page, elab in enumerate(
+                [self.elaborate_super_page0]
+                + [self.elaborate_ram_pages for i in range(1, 0xD)]
+            ):
+                with m.If(((self.address_page) == page)):
+                    elab(m, platform)
         with m.If((~(self.fc)[2])):
             # user mode
-            with m.If(((self.address_page) == 0)):
-                self.elaborate_user_page0(m, platform)
+            for page, elab in enumerate(
+                [self.elaborate_user_page0]
+                + [self.elaborate_ram_pages for i in range(1, 0xD)]
+            ):
+                with m.If(((self.address_page) == page)):
+                    elab(m, platform)
         return m
 
     def elaborate_super_page0(self, m: Module, platform: Platform):
@@ -99,3 +107,10 @@ class AddressDecoder24Bits(Elaboratable):
         ):
             # prevent any access under address 0x800
             m.d.sync += [self.decode.eq(SelectedSubsystem.NONE.value), self.error.eq(1)]
+
+    def elaborate_ram_pages(self, m: Module, platform: Platform):
+        """address page 0x1~0xc map to RAM only, no restriction."""
+        m.d.sync += [
+            self.decode.eq(SelectedSubsystem.RAM.value),
+            self.error.eq(0),
+        ]
